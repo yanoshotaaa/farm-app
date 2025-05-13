@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: #f0fdf4 !important;
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* react-calendarの年月・曜日の色をカスタマイズ */
+.react-calendar__navigation button {
+  color: #15803d !important; /* 濃い緑（Tailwindのgreen-700相当） */
+  font-weight: bold;
+}
+
+.react-calendar__month-view__weekdays {
+  color: #166534 !important; /* さらに濃い緑 */
+  font-weight: bold;
+}
+
+/* 日にち（カレンダーの日付セル）の色を濃い緑に */
+.react-calendar__tile {
+  color: #166534 !important; /* Tailwindのgreen-800相当 */
+  font-weight: bold;
+}
