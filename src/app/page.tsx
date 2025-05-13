@@ -35,7 +35,7 @@ export default function HomePage() {
     if (!isAuth) {
       router.push('/login')
     }
-  }, [])
+  }, [router])
 
   // 作物データの取得と更新を監視する関数
   const fetchCrops = () => {
