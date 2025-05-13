@@ -32,7 +32,7 @@ export default function WeatherPage() {
   const [forecast, setForecast] = useState<ForecastData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [location, setLocation] = useState({
+  const [location] = useState({
     lat: process.env.NEXT_PUBLIC_DEFAULT_LAT || '35.6762',
     lon: process.env.NEXT_PUBLIC_DEFAULT_LON || '139.6503'
   })
@@ -134,7 +134,7 @@ export default function WeatherPage() {
     // 1時間ごとにデータを更新
     const interval = setInterval(fetchWeatherData, 3600000)
     return () => clearInterval(interval)
-  }, [location])
+  }, [])
 
   const getWeatherAdvice = (weather: WeatherInfo) => {
     let temp: number
