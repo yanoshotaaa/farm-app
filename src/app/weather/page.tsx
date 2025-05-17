@@ -163,129 +163,238 @@ export default function WeatherPage() {
   }
 
   return (
-    <div>
-      <div className="mb-8">
-        <Link href="/" className="text-green-600 hover:text-green-800 mb-4 inline-block">
-          ← トップページに戻る
-        </Link>
-        <h1 className="text-3xl font-bold text-gray-800 mt-4">天気予報</h1>
-      </div>
-
-      {loading && !currentWeather ? (
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">天気データを取得中...</p>
-        </div>
-      ) : error ? (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <h2 className="text-xl font-semibold text-red-800 mb-2">エラーが発生しました</h2>
-          <p className="text-red-600 mb-4">{error}</p>
-          <button
-            onClick={fetchWeatherData}
-            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-          >
-            再試行
-          </button>
-        </div>
-      ) : (
-        <div>
-          {currentWeather && (
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-8 hover:shadow-xl transition-shadow">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-semibold text-gray-800">現在の天気</h2>
-                <span className="text-sm text-gray-500">
-                  {new Date(currentWeather.date).toLocaleString('ja-JP')}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex items-center space-x-4">
-                  <div className="text-6xl">
-                    {currentWeather.icon === 'clear' && '☀️'}
-                    {currentWeather.icon === 'partly-cloudy' && '⛅'}
-                    {currentWeather.icon === 'cloudy' && '☁️'}
-                    {currentWeather.icon === 'fog' && '🌫️'}
-                    {currentWeather.icon === 'rain' && '🌧️'}
-                    {currentWeather.icon === 'snow' && '🌨️'}
-                    {currentWeather.icon === 'thunderstorm' && '⛈️'}
-                    {currentWeather.icon === 'unknown' && '❓'}
-                  </div>
-                  <div>
-                    <p className="text-4xl font-bold text-gray-800">
-                      {currentWeather.temperature}°C
-                    </p>
-                    <p className="text-gray-600 capitalize">{currentWeather.description}</p>
-                  </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* ヘッダーナビゲーション */}
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <Link href="/" className="flex items-center">
+                <div className="bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg w-10 h-10 flex items-center justify-center shadow-sm">
+                  <span className="text-xl font-bold tracking-tight">Y</span>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-sm text-gray-600">湿度</p>
-                    <p className="text-xl font-semibold">{currentWeather.humidity}%</p>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-sm text-gray-600">風速</p>
-                    <p className="text-xl font-semibold">{currentWeather.windSpeed} m/s</p>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-sm text-gray-600">降水量</p>
-                    <p className="text-xl font-semibold">{currentWeather.precipitation} mm</p>
-                  </div>
+                <div className="ml-3">
+                  <span className="text-lg font-semibold text-gray-900">農場管理システム</span>
+                  <span className="ml-2 text-sm text-gray-500">Enterprise Edition</span>
                 </div>
-              </div>
-
-              <div className="mt-6 p-4 bg-green-50 rounded-lg">
-                <h3 className="text-lg font-semibold text-green-800 mb-2">農作業アドバイス</h3>
-                <p className="text-green-700">{getWeatherAdvice(currentWeather)}</p>
+              </Link>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="hidden md:flex items-center space-x-4">
+                <Link href="/crops" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium">
+                  作物管理
+                </Link>
+                <Link href="/harvest" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium">
+                  収穫予測
+                </Link>
+                <Link href="/weather" className="text-emerald-600 font-medium px-3 py-2 text-sm border-b-2 border-emerald-600">
+                  気象情報
+                </Link>
               </div>
             </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {forecast.map((day) => (
-              <div key={day.date} className="bg-white rounded-lg shadow-md p-4">
-                <h3 className="font-semibold text-gray-800 mb-2">
-                  {new Date(day.date).toLocaleDateString('ja-JP', { weekday: 'short', month: 'short', day: 'numeric' })}
-                </h3>
-                <div className="flex items-center space-x-2 mb-2">
-                  <div className="text-3xl">
-                    {day.icon === 'clear' && '☀️'}
-                    {day.icon === 'partly-cloudy' && '⛅'}
-                    {day.icon === 'cloudy' && '☁️'}
-                    {day.icon === 'fog' && '🌫️'}
-                    {day.icon === 'rain' && '🌧️'}
-                    {day.icon === 'snow' && '🌨️'}
-                    {day.icon === 'thunderstorm' && '⛈️'}
-                    {day.icon === 'unknown' && '❓'}
-                  </div>
-                  <span className="text-gray-600 capitalize">{day.description}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-red-600">{day.temperature.max}°C</span>
-                  <span className="text-blue-600">{day.temperature.min}°C</span>
-                </div>
-                {day.precipitation > 0 && (
-                  <p className="text-sm text-gray-600 mt-2">
-                    降水量: {day.precipitation}mm
-                  </p>
-                )}
-                <div className="mt-2 text-sm text-green-700">
-                  {getWeatherAdvice(day)}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h2 className="text-lg font-semibold text-yellow-800 mb-2">注意事項</h2>
-            <ul className="list-disc list-inside text-sm text-yellow-700 space-y-1">
-              <li>天気予報は目安です。実際の天候は変動する可能性があります。</li>
-              <li>農作業の判断は、実際の天候や作物の状態を確認してから行ってください。</li>
-              <li>急な天候の変化に備えて、作業計画に余裕を持たせることをお勧めします。</li>
-            </ul>
           </div>
         </div>
-      )}
+      </nav>
+
+      {/* メインコンテンツ */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* ページヘッダー */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">気象情報</h1>
+              <p className="mt-1 text-sm text-gray-500">リアルタイムの天気予報と農作業アドバイス</p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-500">最終更新: {new Date().toLocaleString('ja-JP')}</span>
+              <button
+                onClick={fetchWeatherData}
+                className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors"
+              >
+                <svg className="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                更新
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {loading && !currentWeather ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">天気データを取得中...</p>
+          </div>
+        ) : error ? (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <svg className="mx-auto h-12 w-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <h2 className="text-xl font-semibold text-red-800 mt-4 mb-2">エラーが発生しました</h2>
+            <p className="text-red-600 mb-4">{error}</p>
+            <button
+              onClick={fetchWeatherData}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+            >
+              再試行
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {currentWeather && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900">現在の天気</h2>
+                      <p className="mt-1 text-sm text-gray-500">
+                        {new Date(currentWeather.date).toLocaleString('ja-JP')}
+                      </p>
+                    </div>
+                    <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                      リアルタイム
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="flex items-center space-x-6">
+                      <div className="text-7xl transform hover:scale-110 transition-transform">
+                        {currentWeather.icon === 'clear' && '☀️'}
+                        {currentWeather.icon === 'partly-cloudy' && '⛅'}
+                        {currentWeather.icon === 'cloudy' && '☁️'}
+                        {currentWeather.icon === 'fog' && '🌫️'}
+                        {currentWeather.icon === 'rain' && '🌧️'}
+                        {currentWeather.icon === 'snow' && '🌨️'}
+                        {currentWeather.icon === 'thunderstorm' && '⛈️'}
+                        {currentWeather.icon === 'unknown' && '❓'}
+                      </div>
+                      <div>
+                        <p className="text-5xl font-bold text-gray-900">
+                          {currentWeather.temperature}°C
+                        </p>
+                        <p className="text-xl text-gray-600 mt-1 capitalize">{currentWeather.description}</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                        <div className="flex items-center space-x-2">
+                          <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                          </svg>
+                          <p className="text-sm font-medium text-gray-600">湿度</p>
+                        </div>
+                        <p className="text-2xl font-semibold text-gray-900 mt-2">{currentWeather.humidity}%</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                        <div className="flex items-center space-x-2">
+                          <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          </svg>
+                          <p className="text-sm font-medium text-gray-600">風速</p>
+                        </div>
+                        <p className="text-2xl font-semibold text-gray-900 mt-2">{currentWeather.windSpeed} m/s</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                        <div className="flex items-center space-x-2">
+                          <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                          </svg>
+                          <p className="text-sm font-medium text-gray-600">降水量</p>
+                        </div>
+                        <p className="text-2xl font-semibold text-gray-900 mt-2">{currentWeather.precipitation} mm</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 p-4 bg-emerald-50 rounded-lg border border-emerald-100">
+                    <div className="flex items-start space-x-3">
+                      <svg className="h-6 w-6 text-emerald-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <div>
+                        <h3 className="text-lg font-semibold text-emerald-800">農作業アドバイス</h3>
+                        <p className="text-emerald-700 mt-1">{getWeatherAdvice(currentWeather)}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              {forecast.map((day) => (
+                <div key={day.date} className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                  <div className="p-4">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="font-semibold text-gray-900">
+                        {new Date(day.date).toLocaleDateString('ja-JP', { weekday: 'short', month: 'short', day: 'numeric' })}
+                      </h3>
+                      <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                        予報
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="text-4xl transform hover:scale-110 transition-transform">
+                        {day.icon === 'clear' && '☀️'}
+                        {day.icon === 'partly-cloudy' && '⛅'}
+                        {day.icon === 'cloudy' && '☁️'}
+                        {day.icon === 'fog' && '🌫️'}
+                        {day.icon === 'rain' && '🌧️'}
+                        {day.icon === 'snow' && '🌨️'}
+                        {day.icon === 'thunderstorm' && '⛈️'}
+                        {day.icon === 'unknown' && '❓'}
+                      </div>
+                      <span className="text-gray-600 capitalize">{day.description}</span>
+                    </div>
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center space-x-2">
+                        <svg className="h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                        </svg>
+                        <span className="text-red-600 font-medium">{day.temperature.max}°C</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <svg className="h-4 w-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        </svg>
+                        <span className="text-blue-600 font-medium">{day.temperature.min}°C</span>
+                      </div>
+                    </div>
+                    {day.precipitation > 0 && (
+                      <div className="flex items-center space-x-2 text-sm text-gray-600 mb-3">
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                        <span>降水量: {day.precipitation}mm</span>
+                      </div>
+                    )}
+                    <div className="text-sm text-emerald-700 bg-emerald-50 rounded p-2">
+                      {getWeatherAdvice(day)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+              <div className="flex items-start space-x-3">
+                <svg className="h-6 w-6 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div>
+                  <h2 className="text-lg font-semibold text-yellow-800 mb-2">注意事項</h2>
+                  <ul className="list-disc list-inside text-sm text-yellow-700 space-y-1">
+                    <li>天気予報は目安です。実際の天候は変動する可能性があります。</li>
+                    <li>農作業の判断は、実際の天候や作物の状態を確認してから行ってください。</li>
+                    <li>急な天候の変化に備えて、作業計画に余裕を持たせることをお勧めします。</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   )
 } 

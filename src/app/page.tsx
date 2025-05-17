@@ -39,7 +39,7 @@ export default function HomePage() {
 
   // 作物データの取得と更新を監視する関数
   const fetchCrops = () => {
-    const storedCrops = localStorage.getItem('crops')
+    const storedCrops = localStorage.getItem('farmapp_crops')
     if (storedCrops) {
       setCrops(JSON.parse(storedCrops))
     }
@@ -51,7 +51,7 @@ export default function HomePage() {
 
     // localStorageの変更を監視
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'crops') {
+      if (e.key === 'farmapp_crops') {
         fetchCrops()
       }
     }
@@ -190,207 +190,289 @@ export default function HomePage() {
   }
 
   return (
-    <div>
-      {/* ログアウトボタン */}
-      <div className="flex justify-end mb-2">
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600 transition-colors font-bold"
-        >
-          ログアウト
-        </button>
-      </div>
-      {/* ロゴセクション */}
-      <div className="mb-8">
-        <div className="flex items-center space-x-4">
-          <div className="bg-gradient-to-br from-green-400 via-green-600 to-emerald-500 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-xl border-4 border-white animate-pulse">
-            <span className="text-3xl font-extrabold drop-shadow-lg tracking-wide">Y</span>
-          </div>
-          <div>
-            <p className="text-sm text-emerald-100 drop-shadow font-bold">農場管理システム</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ヘッダーセクション */}
-      <div className="text-center mb-12 bg-white py-8 px-4 rounded-xl shadow-lg">
-        <h1 className="text-4xl font-bold text-white mb-4 bg-green-600 bg-opacity-80 py-4 px-8 rounded-lg inline-block shadow-lg">
-          農場管理アプリ
-        </h1>
-        <p className="text-gray-600 text-lg mt-4">効率的な農場管理をサポートします</p>
-      </div>
-
-      {/* メインコンテンツ */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* 左カラム：天気情報 */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
-              <span className="mr-2">🌤️</span>現在の天気
-            </h2>
-            {loading ? (
-              <div className="animate-pulse">
-                <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+    <div className="min-h-screen bg-gray-50">
+      {/* ヘッダーナビゲーション */}
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 flex items-center">
+                <div className="bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg w-10 h-10 flex items-center justify-center shadow-sm">
+                  <span className="text-xl font-bold tracking-tight">Y</span>
+                </div>
+                <div className="ml-3">
+                  <span className="text-lg font-semibold text-gray-900">農場管理システム</span>
+                  <span className="ml-2 text-sm text-gray-500">Enterprise Edition</span>
+                </div>
               </div>
-            ) : weather ? (
-              <div className="text-center">
-                <div className="text-6xl mb-4">{weather.icon}</div>
-                <p className="text-3xl font-bold text-gray-800 mb-2">
-                  {weather.temperature}°C
-                </p>
-                <p className="text-xl text-gray-600">{weather.description}</p>
-              </div>
-            ) : (
-              <p className="text-gray-500">天気情報を取得できませんでした</p>
-            )}
-            <Link 
-              href="/weather" 
-              className="mt-4 inline-block text-green-600 hover:text-green-800 font-medium"
-            >
-              詳細な天気予報を見る →
-            </Link>
-          </div>
-        </div>
-
-        {/* 中央カラム：作物一覧 */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800 flex items-center">
-                <span className="mr-2">🌱</span>栽培中の作物
-                <span className="ml-2 text-sm font-normal text-gray-500">
-                  （{crops.length}件）
-                </span>
-              </h2>
-              <Link 
-                href="/crops" 
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center"
-              >
-                <span className="mr-1">➕</span>作物を追加
-              </Link>
             </div>
-            {crops.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500 mb-4">まだ作物が登録されていません</p>
-                <Link 
-                  href="/crops" 
-                  className="text-green-600 hover:text-green-800 font-medium inline-flex items-center"
-                >
-                  最初の作物を登録しましょう
-                  <span className="ml-1">→</span>
+            <div className="flex items-center space-x-4">
+              <div className="hidden md:flex items-center space-x-4">
+                <Link href="/crops" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium">
+                  作物管理
+                </Link>
+                <Link href="/harvest" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium">
+                  収穫予測
+                </Link>
+                <Link href="/weather" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium">
+                  気象情報
                 </Link>
               </div>
-            ) : (
-              <div className="space-y-4">
-                {crops.slice(0, 5).map((crop) => (
-                  <Link 
-                    key={crop.id} 
-                    href={`/crops/${crop.id}`}
-                    className="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center space-x-3">
-                        <span className="text-2xl">{getStatusIcon(crop.status)}</span>
-                        <div>
-                          <h3 className="text-lg font-medium text-gray-800">{crop.name}</h3>
-                          <div className="flex items-center space-x-2 text-sm text-gray-600">
-                            <span>{crop.variety}</span>
-                            <span>•</span>
-                            <span>栽培{getDaysSincePlanting(crop.plantingDate)}日目</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-4">
-                        <span className={`px-3 py-1 rounded-full text-sm ${getStatusColor(crop.status)}`}>
-                          {crop.status}
-                        </span>
-                        <span className="text-gray-400">→</span>
-                      </div>
-                    </div>
-                    {crop.records && crop.records.length > 0 && (
-                      <div className="mt-2 text-sm text-gray-500">
-                        最新の記録: {crop.records[crop.records.length - 1].activity}
-                      </div>
-                    )}
-                  </Link>
-                ))}
-                {crops.length > 5 && (
+              <div className="border-l border-gray-200 h-6 mx-2"></div>
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+              >
+                ログアウト
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* メインコンテンツ */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* ダッシュボードヘッダー */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">ダッシュボード</h1>
+              <p className="mt-1 text-sm text-gray-500">農場の現状と最新の活動状況</p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-500">最終更新: {new Date().toLocaleString('ja-JP')}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* メイングリッド */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* 天気情報カード */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                  <span className="mr-2">🌤️</span>気象情報
+                </h2>
+                <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                  リアルタイム
+                </span>
+              </div>
+              {loading ? (
+                <div className="animate-pulse">
+                  <div className="h-8 bg-gray-100 rounded w-3/4 mb-4"></div>
+                  <div className="h-8 bg-gray-100 rounded w-1/2"></div>
+                </div>
+              ) : weather ? (
+                <div className="text-center">
+                  <div className="text-6xl mb-4 transform hover:scale-110 transition-transform">{weather.icon}</div>
+                  <p className="text-3xl font-bold text-gray-900 mb-2">
+                    {weather.temperature}°C
+                  </p>
+                  <p className="text-base font-medium text-gray-900">{weather.description}</p>
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <Link 
+                      href="/weather" 
+                      className="inline-flex items-center text-sm font-medium text-emerald-600 hover:text-emerald-700"
+                    >
+                      詳細な天気予報
+                      <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-gray-900 font-medium">データ取得中...</p>
+              )}
+            </div>
+          </div>
+
+          {/* 作物一覧カード */}
+          <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <span className="mr-2">🌱</span>栽培状況
+                  </h2>
+                  <p className="mt-1 text-sm text-gray-500">
+                    現在 {crops.length} 件の作物を管理中
+                  </p>
+                </div>
+                <Link 
+                  href="/crops" 
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors shadow-sm"
+                >
+                  <svg className="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  新規登録
+                </Link>
+              </div>
+              {crops.length === 0 ? (
+                <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-100">
+                  <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                  </svg>
+                  <p className="mt-2 text-sm text-gray-500">登録されている作物はありません</p>
                   <Link 
                     href="/crops" 
-                    className="block text-center text-green-600 hover:text-green-800 font-medium mt-4"
+                    className="mt-4 inline-flex items-center text-sm font-medium text-emerald-600 hover:text-emerald-700"
                   >
-                    すべての作物を見る →
+                    最初の作物を登録する
+                    <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
                   </Link>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* 下部セクション：最近の活動記録 */}
-        <div className="lg:col-span-3">
-          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
-              <span className="mr-2">📝</span>最近の活動記録
-            </h2>
-            {getRecentActivities().length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-500">まだ活動記録がありません</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {getRecentActivities().map((record, index) => (
-                  <div 
-                    key={index} 
-                    className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-medium text-gray-800">{record.cropName}</h3>
-                        <p className="text-gray-600">{record.activity}</p>
-                        {record.notes && (
-                          <p className="text-sm text-gray-500 mt-1">{record.notes}</p>
-                        )}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {crops.slice(0, 5).map((crop) => (
+                    <Link 
+                      key={crop.id} 
+                      href={`/crops/${crop.id}`}
+                      className="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-100 group"
+                    >
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center space-x-3">
+                          <span className="text-2xl transform group-hover:scale-110 transition-transform">{getStatusIcon(crop.status)}</span>
+                          <div>
+                            <h3 className="text-base font-medium text-gray-900 group-hover:text-emerald-600 transition-colors">{crop.name}</h3>
+                            <div className="flex items-center space-x-2 text-sm text-gray-600">
+                              <span>{crop.variety}</span>
+                              <span>•</span>
+                              <span>栽培{getDaysSincePlanting(crop.plantingDate)}日目</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(crop.status)}`}>
+                            {crop.status}
+                          </span>
+                          <svg className="w-5 h-5 text-gray-400 group-hover:text-emerald-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
                       </div>
-                      <span className="text-sm text-gray-500">
-                        {new Date(record.date).toLocaleDateString('ja-JP')}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                      {crop.records && crop.records.length > 0 && (
+                        <div className="mt-2 text-sm text-gray-600">
+                          最新の記録: {crop.records[crop.records.length - 1].activity}
+                        </div>
+                      )}
+                    </Link>
+                  ))}
+                  {crops.length > 5 && (
+                    <Link 
+                      href="/crops" 
+                      className="block text-center text-sm font-medium text-emerald-600 hover:text-emerald-700 mt-4"
+                    >
+                      すべての作物を表示
+                    </Link>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* クイックアクセスメニュー */}
-        <div className="lg:col-span-3">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link 
-              href="/harvest" 
-              className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl p-6 hover:from-green-600 hover:to-green-700 transition-colors shadow-lg hover:shadow-xl"
-            >
-              <h3 className="text-xl font-semibold mb-2">収穫予測</h3>
-              <p className="text-green-100">作物の収穫時期を予測</p>
-            </Link>
-            <Link 
-              href="/weather" 
-              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl p-6 hover:from-blue-600 hover:to-blue-700 transition-colors shadow-lg hover:shadow-xl"
-            >
-              <h3 className="text-xl font-semibold mb-2">天気予報</h3>
-              <p className="text-blue-100">詳細な天気情報を確認</p>
-            </Link>
-            <Link 
-              href="/crops" 
-              className="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl p-6 hover:from-purple-600 hover:to-purple-700 transition-colors shadow-lg hover:shadow-xl"
-            >
-              <h3 className="text-xl font-semibold mb-2">作物管理</h3>
-              <p className="text-purple-100">作物の詳細を管理</p>
-            </Link>
+          {/* 最近の活動記録カード */}
+          <div className="lg:col-span-3 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <span className="mr-2">📝</span>活動ログ
+                  </h2>
+                  <p className="mt-1 text-sm text-gray-500">
+                    最新の作業記録
+                  </p>
+                </div>
+                <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                  最新5件
+                </span>
+              </div>
+              {getRecentActivities().length === 0 ? (
+                <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-100">
+                  <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  <p className="mt-2 text-sm text-gray-500">活動記録はありません</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {getRecentActivities().map((record, index) => (
+                    <div 
+                      key={index} 
+                      className="p-4 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-medium text-gray-900">{record.cropName}</h3>
+                          <p className="text-sm text-gray-600 mt-1">{record.activity}</p>
+                          {record.notes && (
+                            <p className="text-sm text-gray-500 mt-1">{record.notes}</p>
+                          )}
+                        </div>
+                        <span className="text-sm font-medium text-gray-500 bg-white px-2 py-1 rounded-full border border-gray-200">
+                          {new Date(record.date).toLocaleDateString('ja-JP')}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* クイックアクセスメニュー */}
+          <div className="lg:col-span-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Link 
+                href="/harvest" 
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow group"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="bg-emerald-100 p-3 rounded-lg group-hover:bg-emerald-200 transition-colors">
+                    <span className="text-2xl">📊</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 group-hover:text-emerald-600 transition-colors">収穫予測</h3>
+                    <p className="text-sm text-gray-600 mt-1">作物の収穫時期を予測・管理</p>
+                  </div>
+                </div>
+              </Link>
+              <Link 
+                href="/weather" 
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow group"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="bg-blue-100 p-3 rounded-lg group-hover:bg-blue-200 transition-colors">
+                    <span className="text-2xl">🌤️</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 group-hover:text-blue-600 transition-colors">天気予報</h3>
+                    <p className="text-sm text-gray-600 mt-1">詳細な気象情報の確認</p>
+                  </div>
+                </div>
+              </Link>
+              <Link 
+                href="/crops" 
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow group"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="bg-purple-100 p-3 rounded-lg group-hover:bg-purple-200 transition-colors">
+                    <span className="text-2xl">🌱</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 group-hover:text-purple-600 transition-colors">作物管理</h3>
+                    <p className="text-sm text-gray-600 mt-1">作物の詳細情報の管理</p>
+                  </div>
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
