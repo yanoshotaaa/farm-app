@@ -27,6 +27,7 @@ export default function HomePage() {
   const [crops, setCrops] = useState<Crop[]>([])
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [currentTime, setCurrentTime] = useState<string>("")
   const router = useRouter()
 
   // 認証チェック
@@ -132,6 +133,16 @@ export default function HomePage() {
     fetchWeather()
   }, [])
 
+  useEffect(() => {
+    // クライアントサイドでのみ時刻を更新
+    const updateTime = () => {
+      setCurrentTime(new Date().toLocaleString('ja-JP'))
+    }
+    updateTime() // 初期表示
+    const timer = setInterval(updateTime, 1000) // 1秒ごとに更新
+    return () => clearInterval(timer)
+  }, [])
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case '育苗中':
@@ -189,6 +200,12 @@ export default function HomePage() {
     router.push('/login')
   }
 
+  // 開発用リセット機能
+  const handleReset = () => {
+    localStorage.removeItem('farmapp_crops')
+    fetchCrops() // 作物リストを更新
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ヘッダーナビゲーション */}
@@ -201,7 +218,7 @@ export default function HomePage() {
                   <span className="text-xl font-bold tracking-tight">Y</span>
                 </div>
                 <div className="ml-3">
-                  <span className="text-lg font-semibold text-gray-900">農場管理システム</span>
+                  <span className="text-lg font-semibold text-gray-900">農業管理システム</span>
                   <span className="ml-2 text-sm text-gray-500">Enterprise Edition</span>
                 </div>
               </div>
@@ -220,10 +237,44 @@ export default function HomePage() {
               </div>
               <div className="border-l border-gray-200 h-6 mx-2"></div>
               <button
-                onClick={handleLogout}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                onClick={handleReset}
+                className="group relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-yellow-600 transition-colors duration-200 mr-2"
               >
-                ログアウト
+                <span className="absolute inset-0 bg-yellow-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                <svg 
+                  className="w-5 h-5 mr-2 text-gray-500 group-hover:text-yellow-600 transition-colors duration-200" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth="2" 
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" 
+                  />
+                </svg>
+                <span className="relative">データリセット</span>
+              </button>
+              <button
+                onClick={handleLogout}
+                className="group relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-colors duration-200"
+              >
+                <span className="absolute inset-0 bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                <svg 
+                  className="w-5 h-5 mr-2 text-gray-500 group-hover:text-red-600 transition-colors duration-200" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth="2" 
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" 
+                  />
+                </svg>
+                <span className="relative">ログアウト</span>
               </button>
             </div>
           </div>
@@ -240,7 +291,9 @@ export default function HomePage() {
               <p className="mt-1 text-sm text-gray-500">農場の現状と最新の活動状況</p>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">最終更新: {new Date().toLocaleString('ja-JP')}</span>
+              <span className="text-sm text-gray-500">
+                最終更新: {currentTime || "読み込み中..."}
+              </span>
             </div>
           </div>
         </div>
