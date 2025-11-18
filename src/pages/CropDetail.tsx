@@ -1,6 +1,7 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCropStore } from '../store/cropStore';
 import { formatDate, getDaysUntil } from '../utils/dateUtils';
+import toast from 'react-hot-toast';
 import { 
   ArrowLeft, 
   Edit, 
@@ -11,18 +12,24 @@ import {
   Plus,
   Image as ImageIcon
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import GrowthRecordModal from '../components/GrowthRecordModal';
 import TaskModal from '../components/TaskModal';
 
 const CropDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getCrop, deleteCrop, getGrowthRecords, getTasks, addTask, completeTask, updateCrop } = useCropStore();
+  const { getCrop, deleteCrop, getGrowthRecords, getTasks, addTask, completeTask, updateCrop, loadGrowthRecords } = useCropStore();
   const [showGrowthModal, setShowGrowthModal] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
 
   const crop = id ? getCrop(id) : undefined;
+
+  useEffect(() => {
+    if (id) {
+      loadGrowthRecords(id);
+    }
+  }, [id, loadGrowthRecords]);
 
   if (!crop) {
     return (
@@ -40,19 +47,29 @@ const CropDetail = () => {
   const pendingTasks = tasks.filter((t) => !t.completed);
   const completedTasks = tasks.filter((t) => t.completed);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm(`「${crop.name}」を削除してもよろしいですか？`)) {
-      deleteCrop(crop.id);
-      navigate('/crops');
+      try {
+        await deleteCrop(crop.id);
+        toast.success(`「${crop.name}」を削除しました`);
+        navigate('/crops');
+      } catch (error) {
+        toast.error('削除に失敗しました。もう一度お試しください。');
+      }
     }
   };
 
-  const handleHarvest = () => {
+  const handleHarvest = async () => {
     if (window.confirm(`「${crop.name}」を収穫済みにマークしますか？`)) {
-      updateCrop(crop.id, {
-        status: 'harvested',
-        actualHarvestDate: new Date().toISOString().split('T')[0],
-      });
+      try {
+        await updateCrop(crop.id, {
+          status: 'harvested',
+          actualHarvestDate: new Date().toISOString().split('T')[0],
+        });
+        toast.success(`「${crop.name}」を収穫済みにマークしました`);
+      } catch (error) {
+        toast.error('更新に失敗しました。もう一度お試しください。');
+      }
     }
   };
 
@@ -236,7 +253,13 @@ const CropDetail = () => {
                         </p>
                       </div>
                       <button
-                        onClick={() => completeTask(task.id)}
+                        onClick={async () => {
+                          try {
+                            await completeTask(task.id);
+                          } catch (error) {
+                            alert('タスクの完了に失敗しました。もう一度お試しください。');
+                          }
+                        }}
                         className="btn btn-primary text-sm"
                       >
                         完了

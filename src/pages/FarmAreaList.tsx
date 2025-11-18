@@ -8,9 +8,13 @@ const FarmAreaList = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingArea, setEditingArea] = useState<string | null>(null);
 
-  const handleDelete = (id: string, name: string) => {
+  const handleDelete = async (id: string, name: string) => {
     if (window.confirm(`「${name}」を削除してもよろしいですか？`)) {
-      deleteFarmArea(id);
+      try {
+        await deleteFarmArea(id);
+      } catch (error) {
+        alert('削除に失敗しました。もう一度お試しください。');
+      }
     }
   };
 

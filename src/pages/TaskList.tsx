@@ -157,7 +157,13 @@ const TaskList = () => {
                       </div>
                     </div>
                     <button
-                      onClick={() => completeTask(task.id)}
+                      onClick={async () => {
+                        try {
+                          await completeTask(task.id);
+                        } catch (error) {
+                          alert('タスクの完了に失敗しました。もう一度お試しください。');
+                        }
+                      }}
                       className="btn btn-primary ml-4"
                     >
                       <CheckCircle className="h-5 w-5" />

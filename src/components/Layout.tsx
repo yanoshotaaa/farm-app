@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Sprout, 
@@ -8,9 +8,12 @@ import {
   X,
   Calendar,
   Database,
-  MessageCircle
+  MessageCircle,
+  LogOut,
+  User
 } from 'lucide-react';
 import { useState } from 'react';
+import { useAuthStore } from '../store/authStore';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -18,7 +21,16 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, signOut } = useAuthStore();
+
+  const handleSignOut = async () => {
+    if (window.confirm('ログアウトしますか？')) {
+      await signOut();
+      navigate('/login');
+    }
+  };
 
   const navigation = [
     { name: 'ダッシュボード', href: '/dashboard', icon: LayoutDashboard },
@@ -43,13 +55,30 @@ const Layout = ({ children }: LayoutProps) => {
               <h1 className="text-2xl font-bold text-gray-900">農業作物管理</h1>
             </div>
             
-            {/* モバイルメニューボタン */}
-            <button
-              className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+            <div className="flex items-center gap-2">
+              {user && (
+                <div className="hidden md:flex items-center gap-2 mr-4">
+                  <User className="h-5 w-5 text-gray-600" />
+                  <span className="text-sm text-gray-700">{user.email}</span>
+                </div>
+              )}
+              <button
+                onClick={handleSignOut}
+                className="btn btn-secondary flex items-center text-sm"
+                title="ログアウト"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                <span className="hidden md:inline">ログアウト</span>
+              </button>
+              
+              {/* モバイルメニューボタン */}
+              <button
+                className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            </div>
           </div>
         </div>
       </header>

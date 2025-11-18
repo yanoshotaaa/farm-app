@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useCropStore } from '../store/cropStore';
 import { ArrowLeft } from 'lucide-react';
+import toast from 'react-hot-toast';
 import ImageUpload from '../components/ImageUpload';
 
 const CropForm = () => {
@@ -38,24 +39,69 @@ const CropForm = () => {
     }
   }, [crop]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (isEdit && id) {
-      updateCrop(id, {
-        ...formData,
-        plantingDate: new Date(formData.plantingDate).toISOString(),
-        expectedHarvestDate: new Date(formData.expectedHarvestDate).toISOString(),
-      });
-    } else {
-      addCrop({
-        ...formData,
-        plantingDate: new Date(formData.plantingDate).toISOString(),
-        expectedHarvestDate: new Date(formData.expectedHarvestDate).toISOString(),
-      });
+    // バリデーション
+    if (!formData.name.trim()) {
+      toast.error('作物名を入力してください');
+      return;
+    }
+    if (!formData.variety.trim()) {
+      toast.error('品種を入力してください');
+      return;
+    }
+    if (!formData.location.trim()) {
+      toast.error('場所を入力してください');
+      return;
+    }
+    if (!formData.expectedHarvestDate) {
+      toast.error('収穫予定日を入力してください');
+      return;
     }
     
-    navigate(isEdit ? `/crops/${id}` : '/crops');
+    try {
+      if (isEdit && id) {
+        await updateCrop(id, {
+          ...formData,
+          plantingDate: new Date(formData.plantingDate).toISOString(),
+          expectedHarvestDate: new Date(formData.expectedHarvestDate).toISOString(),
+        });
+        toast.success('作物を更新しました');
+      } else {
+        await addCrop({
+          ...formData,
+          plantingDate: new Date(formData.plantingDate).toISOString(),
+          expectedHarvestDate: new Date(formData.expectedHarvestDate).toISOString(),
+        });
+        toast.success('作物を追加しました');
+      }
+      
+      navigate(isEdit ? `/crops/${id}` : '/crops');
+    } catch (error: any) {
+      console.error('保存エラー:', error);
+      let errorMessage = '保存に失敗しました。もう一度お試しください。';
+      
+      if (error?.code) {
+        switch (error.code) {
+          case 'permission-denied':
+            errorMessage = '保存権限がありません。Firebase Consoleでセキュリティルールを確認してください。';
+            break;
+          case 'unavailable':
+            errorMessage = 'Firestoreに接続できません。インターネット接続を確認してください。';
+            break;
+          case 'failed-precondition':
+            errorMessage = 'Firestoreインデックスが必要です。Firebase Consoleでインデックスを作成してください。';
+            break;
+          default:
+            errorMessage = `エラー: ${error.code} - ${error.message || '保存に失敗しました'}`;
+        }
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
+    }
   };
 
   return (

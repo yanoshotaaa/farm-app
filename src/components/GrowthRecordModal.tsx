@@ -16,16 +16,20 @@ const GrowthRecordModal = ({ cropId, onClose }: GrowthRecordModalProps) => {
     width: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    addGrowthRecord({
-      cropId,
-      date: new Date(formData.date).toISOString(),
-      notes: formData.notes,
-      height: formData.height ? parseFloat(formData.height) : undefined,
-      width: formData.width ? parseFloat(formData.width) : undefined,
-    });
-    onClose();
+    try {
+      await addGrowthRecord({
+        cropId,
+        date: new Date(formData.date).toISOString(),
+        notes: formData.notes,
+        height: formData.height ? parseFloat(formData.height) : undefined,
+        width: formData.width ? parseFloat(formData.width) : undefined,
+      });
+      onClose();
+    } catch (error) {
+      alert('成長記録の追加に失敗しました。もう一度お試しください。');
+    }
   };
 
   return (

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCropStore } from '../store/cropStore';
 import { exportToJSON, exportToCSV, importFromJSON } from '../utils/exportUtils';
+import * as firestoreService from '../services/firestoreService';
 import { Download, Upload, FileJson, FileSpreadsheet, Trash2, AlertTriangle } from 'lucide-react';
 
 const DataManagement = () => {
@@ -42,11 +43,15 @@ const DataManagement = () => {
           `注意: 既存のデータは上書きされます。`
         )
       ) {
-        importData(data);
-        setImportSuccess(true);
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+        try {
+          await importData(data);
+          setImportSuccess(true);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } catch (error) {
+          setImportError('データのインポートに失敗しました');
+        }
       }
     } catch (error) {
       setImportError(error instanceof Error ? error.message : 'インポートに失敗しました');
@@ -56,14 +61,25 @@ const DataManagement = () => {
     e.target.value = '';
   };
 
-  const handleClearAll = () => {
+  const handleClearAll = async () => {
     if (
       window.confirm(
         'すべてのデータを削除しますか？この操作は取り消せません。'
       )
     ) {
-      localStorage.removeItem('farm-crop-storage');
-      window.location.reload();
+      try {
+        // Firestoreからすべてのデータを削除
+        const deletePromises = [
+          ...crops.map((c) => firestoreService.cropService.delete(c.id)),
+          ...growthRecords.map((r) => firestoreService.growthRecordService.delete(r.id)),
+          ...tasks.map((t) => firestoreService.taskService.delete(t.id)),
+          ...farmAreas.map((a) => firestoreService.farmAreaService.delete(a.id)),
+        ];
+        await Promise.all(deletePromises);
+        window.location.reload();
+      } catch (error) {
+        alert('データの削除に失敗しました。もう一度お試しください。');
+      }
     }
   };
 
