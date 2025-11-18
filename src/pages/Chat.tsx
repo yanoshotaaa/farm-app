@@ -5,32 +5,38 @@ import ChatMessageComponent from '../components/ChatMessage';
 import { Send, Trash2, Bot } from 'lucide-react';
 
 const Chat = () => {
-  const { messages, addMessage, clearMessages, deleteMessage } = useChatStore();
+  const { messages, addMessage, clearMessages, deleteMessage, loadMessages } = useChatStore();
   const { crops } = useCropStore();
   const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
+    // 初回読み込み
+    loadMessages();
+  }, [loadMessages]);
+
+  useEffect(() => {
     // メッセージが追加されたら自動スクロール
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim()) return;
 
-    // ユーザーメッセージを追加
-    addMessage(inputText.trim(), 'user');
-
-    // 簡単な応答ロジック（キーワードベース）
-    setTimeout(() => {
-      const response = generateResponse(inputText.trim());
-      addMessage(response.text, 'system', response.cropId);
-    }, 500);
-
+    const userMessage = inputText.trim();
     setInputText('');
     inputRef.current?.focus();
+
+    // ユーザーメッセージを追加
+    await addMessage(userMessage, 'user');
+
+    // 簡単な応答ロジック（キーワードベース）
+    setTimeout(async () => {
+      const response = generateResponse(userMessage);
+      await addMessage(response.text, 'system', response.cropId);
+    }, 500);
   };
 
   const generateResponse = (text: string): { text: string; cropId?: string } => {
@@ -83,9 +89,9 @@ const Chat = () => {
     };
   };
 
-  const handleClear = () => {
+  const handleClear = async () => {
     if (window.confirm('すべてのメッセージを削除しますか？')) {
-      clearMessages();
+      await clearMessages();
     }
   };
 

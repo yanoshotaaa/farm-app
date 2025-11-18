@@ -28,20 +28,24 @@ const FarmAreaModal = ({ areaId, onClose }: FarmAreaModalProps) => {
     }
   }, [area]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isEdit && areaId) {
-      updateFarmArea(areaId, {
-        ...formData,
-        area: parseFloat(formData.area) || 0,
-      });
-    } else {
-      addFarmArea({
-        ...formData,
-        area: parseFloat(formData.area) || 0,
-      });
+    try {
+      if (isEdit && areaId) {
+        await updateFarmArea(areaId, {
+          ...formData,
+          area: parseFloat(formData.area) || 0,
+        });
+      } else {
+        await addFarmArea({
+          ...formData,
+          area: parseFloat(formData.area) || 0,
+        });
+      }
+      onClose();
+    } catch (error) {
+      alert('保存に失敗しました。もう一度お試しください。');
     }
-    onClose();
   };
 
   return (

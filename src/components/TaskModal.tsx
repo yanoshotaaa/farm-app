@@ -23,18 +23,22 @@ const TaskModal = ({ cropId, onClose }: TaskModalProps) => {
     }
   }, [cropId]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.cropId) {
       alert('作物を選択してください');
       return;
     }
-    addTask({
-      ...formData,
-      dueDate: new Date(formData.dueDate).toISOString(),
-      completed: false,
-    });
-    onClose();
+    try {
+      await addTask({
+        ...formData,
+        dueDate: new Date(formData.dueDate).toISOString(),
+        completed: false,
+      });
+      onClose();
+    } catch (error) {
+      alert('タスクの追加に失敗しました。もう一度お試しください。');
+    }
   };
 
   return (

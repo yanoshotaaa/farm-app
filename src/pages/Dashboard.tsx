@@ -7,10 +7,12 @@ import {
   CheckCircle, 
   AlertCircle,
   Calendar,
-  BarChart3
+  BarChart3,
+  Clock,
+  Target
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
 const Dashboard = () => {
   const { crops, tasks } = useCropStore();
@@ -110,6 +112,48 @@ const Dashboard = () => {
             </div>
             <div className="p-3 bg-yellow-100 rounded-full">
               <AlertCircle className="h-8 w-8 text-yellow-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 追加統計カード */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">平均成長日数</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">
+                {stats.averageGrowthDays > 0 ? `${stats.averageGrowthDays}日` : '-'}
+              </p>
+            </div>
+            <div className="p-3 bg-purple-100 rounded-full">
+              <Clock className="h-8 w-8 text-purple-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">近々の収穫予定</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{stats.upcomingHarvests}</p>
+              <p className="text-xs text-gray-500 mt-1">7日以内</p>
+            </div>
+            <div className="p-3 bg-orange-100 rounded-full">
+              <Target className="h-8 w-8 text-orange-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">期限切れタスク</p>
+              <p className="text-3xl font-bold text-red-600 mt-2">{stats.overdueTasks}</p>
+            </div>
+            <div className="p-3 bg-red-100 rounded-full">
+              <AlertCircle className="h-8 w-8 text-red-600" />
             </div>
           </div>
         </div>

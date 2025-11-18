@@ -3,12 +3,16 @@ import { Link } from 'react-router-dom';
 import { useCropStore } from '../store/cropStore';
 import { formatDate, getDaysUntil } from '../utils/dateUtils';
 import { Plus, Search, Filter, Edit, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import LoadingSpinner from '../components/LoadingSpinner';
+import { CropCardSkeleton } from '../components/SkeletonLoader';
 import type { Crop } from '../types';
 
 const CropList = () => {
-  const { crops, deleteCrop } = useCropStore();
+  const { crops, deleteCrop, loading } = useCropStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'growing' | 'harvested' | 'removed'>('all');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const filteredCrops = crops.filter((crop) => {
     const matchesSearch =
@@ -21,9 +25,17 @@ const CropList = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const handleDelete = (id: string, name: string) => {
+  const handleDelete = async (id: string, name: string) => {
     if (window.confirm(`「${name}」を削除してもよろしいですか？`)) {
-      deleteCrop(id);
+      setDeletingId(id);
+      try {
+        await deleteCrop(id);
+        toast.success(`「${name}」を削除しました`);
+      } catch (error) {
+        toast.error('削除に失敗しました。もう一度お試しください。');
+      } finally {
+        setDeletingId(null);
+      }
     }
   };
 
@@ -85,7 +97,13 @@ const CropList = () => {
       </div>
 
       {/* 作物リスト */}
-      {filteredCrops.length > 0 ? (
+      {loading && crops.length === 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <CropCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : filteredCrops.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCrops.map((crop) => {
             const daysUntilHarvest = crop.status === 'growing' 
@@ -93,7 +111,7 @@ const CropList = () => {
               : null;
             
             return (
-              <div key={crop.id} className="card hover:shadow-lg transition-shadow">
+              <div key={crop.id} className="card animate-fade-in">
                 {crop.imageUrl && (
                   <Link to={`/crops/${crop.id}`} className="block mb-4">
                     <img
@@ -114,9 +132,15 @@ const CropList = () => {
                     </Link>
                     <button
                       onClick={() => handleDelete(crop.id, crop.name)}
-                      className="p-2 text-gray-600 hover:text-red-600 hover:bg-gray-100 rounded"
+                      disabled={deletingId === crop.id}
+                      className="p-2 text-gray-600 hover:text-red-600 hover:bg-gray-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="削除"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      {deletingId === crop.id ? (
+                        <LoadingSpinner size="sm" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
                     </button>
                   </div>
                 </div>
